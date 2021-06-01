@@ -1,0 +1,11 @@
+#Filter        columns  cal(AB or Vega,optional)  zp_error  zp_offset
+RISALSSTu      8,9	AB     	  		  0.005	    0.0
+RISALSSTg      10,11	AB			  0.005     0.0
+RISALSSTr      12,13	AB			  0.005	    0.0
+RISALSSTi      14,15	AB			  0.005	    0.0
+RISALSSTz      16,17	AB			  0.005	    0.0
+RISALSSTy4     18,19	AB			  0.005	    0.0
+Z_S 	       6
+ID		1
+M_0		14
+OTHER		1,2,3,4,5

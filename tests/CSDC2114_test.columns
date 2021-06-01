@@ -1,0 +1,11 @@
+#Filter        columns  cal(AB or Vega,optional)  zp_error  zp_offset
+DC2LSST_u      scatmag_u, scaterr_u	AB     	  		  0.005	    0.0
+DC2LSST_g      scatmag_g, scaterr_g	AB			  0.005     0.0
+DC2LSST_r      scatmag_r, scaterr_g	AB			  0.005	    0.0
+DC2LSST_i      scatmag_i, scaterr_i	AB			  0.005	    0.0
+DC2LSST_z      scatmag_z, scaterr_z	AB			  0.005	    0.0
+DC2LSST_y      scatmag_y, scaterr_y	AB			  0.005	    0.0
+Z_S 	       redshift
+ID		baseDC2/galaxy_id
+M_0		scatmag_i
+

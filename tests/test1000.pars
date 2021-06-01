@@ -1,0 +1,23 @@
+COLUMNS     CSDC2114_test.columns
+OUTPUT	    test1000.bpz.h5
+SPECTRA     CWWSB4.list
+PRIOR	    hdfn_gen
+DZ          0.01
+ZMIN        0.005
+ZMAX        3.505
+MAG         yes
+NEW_AB      no
+MADAU	    no #TURN OFF MADAU!!!!
+EXCLUDE     none
+CHECK       yes
+#ZC          1.0,2.0
+#FC          0.2,0.4
+VERBOSE     no
+#INTERP      0
+ODDS        0.68
+PROBS       no
+PROBS_LITE  test1000_probs.h5
+GET_Z       yes
+INTERACTIVE yes
+PLOTS       no
+#ONLY_TYPE   yes
