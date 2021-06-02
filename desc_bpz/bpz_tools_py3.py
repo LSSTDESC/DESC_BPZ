@@ -32,7 +32,7 @@ ab_clip=1e-6
 
 
 #Initialize path info
-bpz_dir=os.getenv('BPZPY3PATH')
+#bpz_dir=os.getenv('BPZPY3PATH')
 data_dir = os.getenv('BPZDATAPATH')
 fil_dir=data_dir+'/FILTER/'
 sed_dir=data_dir+'/SED/'
