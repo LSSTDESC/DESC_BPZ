@@ -131,8 +131,39 @@ def get_limitingmagnitude(m,dm,sigma=1.,dm_int=0.2):
 
 
 #Synthetic photometry functions
+#updated version of etau_madau, taken from Dan Coe's comment on STScI's
+#SYNPHOT package: https://github.com/spacetelescope/synphot_refactor/issues/77
+def etau_madau(wl, z):
+    """
+    Madau 1995 extinction for a galaxy spectrum at redshift z 
+    defined on a wavelength grid wl
+    """
+    n=len(wl)
+    ll=912.
+    c=array([3.6e-3,1.7e-3,1.2e-3,9.3e-4])
+    l=array([1216.,1026.,973.,950.])
+    tau=wl*0.
+    xe=1.+z
 
-def etau_madau(wl,z):
+    #Lyman series
+    for i in range(len(l)):
+        tau=where(wl<=l[i]*xe,tau+c[i]*(wl/l[i])**3.46,tau)
+
+    #Photoelectric absorption
+    xc=wl/ll
+    xc3=xc**3
+    tau=where(wl<=ll*xe,
+              tau+0.25*xc3*(xe**.46-xc**0.46)\
+                  +9.4*xc**1.5*(xe**0.18-xc**0.18)\
+                  -0.7*xc3*(xc**(-1.32)-xe**(-1.32))\
+                  -0.023*(xe**1.68-xc**1.68),
+              tau)
+
+    return where(tau > 700., 0., exp(-tau))
+
+
+#This is the original, broken, version of etau_madau!
+def etau_madau_broken(wl,z):
     """
     Madau 1995 extinction for a galaxy spectrum at redshift z 
     defined on a wavelenght grid wl
