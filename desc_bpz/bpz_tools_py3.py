@@ -138,10 +138,9 @@ def etau_madau(wl, z):
     Madau 1995 extinction for a galaxy spectrum at redshift z 
     defined on a wavelength grid wl
 
-    Note that this parameterization has an uptick in exp(-tau) as you approach
-    the Lyman Limit.  I don't think that this is physical, *but* it's highly
-    doubtful that we will have Far UV filters observed at <~1000 angstroms.  
-    But, I wanted to put a note here just in case.
+    Note that Madau parameterization has an uptick in exp(-tau) as you approach
+    the Lyman Limit.  Adam Broussard mentioned a hack to set wl<max(tau) = max(tau)
+    that will "solve" this, so I'll implement this in the code below
     """
     n=len(wl)
     ll=912.
@@ -163,6 +162,10 @@ def etau_madau(wl, z):
                   -0.7*xc3*(xc**(-1.32)-xe**(-1.32))\
                   -0.023*(xe**1.68-xc**1.68),
               tau)
+    #check for nan, as wl==0 is nan, and screws up the hack
+    tau = where(isnan(tau), 0.0, tau)
+    #"hack" from Adam Broussard
+    tau = where(wl<wl[argmax(tau)], max(tau), tau)
 
     return where(tau > 700., 0., exp(-tau))
 
