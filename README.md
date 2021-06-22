@@ -11,6 +11,7 @@ In order to run, you should set the environment variable<br>
 
 To run traditional command-line `BPZ` use the `bpz.py` file in `scripts`, e.g.:<br>
 `python scripts/bpz.py yourasciicatalog.cat -P yourparameterfile.pars` <br>
+Dan Coe's STScI webpage listed above contains a nice BPZ user guide, for more detail on running the code, please check that website.<br>.
 
 However, this package will mainly be used as a library for running "bpz_lite" in the DESC PZ RAIL Package, see:<br>
 https://github.com/LSSTDESC/RAIL
