@@ -33,6 +33,7 @@ setup(
     install_requires=['numpy',
                       'scipy',
                       'pandas>=1.1',
+                      'h5py',
                       ],
     python_requires='>=3.5',
     setup_requires=['pytest-runner'],
