@@ -2,7 +2,7 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main ]
+    branches: [ addpytest ]
   pull_request:
     branches: [ main ]
 
@@ -30,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install tables
+        pip install tables pytest
 
     - name: Run test script
       run: |
