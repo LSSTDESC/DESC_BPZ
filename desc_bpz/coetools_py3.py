@@ -28,6 +28,7 @@ from desc_bpz.MLab_coe_py3 import * #median, std, mean
 #import numarray
 #import pyfits
 from desc_bpz.compress2_py3 import compress2 as compress
+from desc_bpz.paths import get_sed_file
 #import popen2
 import subprocess
 import string  # LOAD THIS AFTER numpy, BECAUSE numpy HAS ITS OWN string
@@ -594,12 +595,9 @@ def takeids(data, ids, idrow=0, keepzeros=0):
 #################################
 # FLUX, BPZ
 
-bpzpath = os.environ.get('BPZPY3PATH', '')
-datapath = os.environ.get('BPZDATAPATH', '')
-
 def bpzsedname(tb, seds, interp=2):
     if type(seds) == str:
-        seds = loadfile(datapath + '/SED/' + seds)
+        seds = loadfile(get_sed_file(seds))
     rb = roundint(tb)
     name = seds[rb-1]
     if abs(rb - tb) > 0.1:
