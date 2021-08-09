@@ -32,8 +32,13 @@ jobs:
         pip install .
         pip install tables
 
-    - name: Run test data file
+    - name: Run test script
       run: |
         export BPZDATAPATH=$PWD
         cd tests
         python ../scripts/bpz.py test1000.h5 -P test1000.pars
+
+    - name: Run other tests
+      run: |
+        cd tests
+        pytest

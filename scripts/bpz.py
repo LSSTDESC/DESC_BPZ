@@ -14,14 +14,11 @@ Why are the odds gettig messed up? might be the z_thru parameter.
 
 NOTE: We have added two *required* environment variables!!!  BPZ will fail if these are not set!
 
-BPZPY3PATH: the path to the BPZ or DESC_BPZ package!  This is used for importing some of the functions
 
-BPZDATAPATH: The file path to the directory containing the SED, FILTER, and AB directories.  They may or may not be the same as the BPZPY3PATH depending on how you have things set up.
+BPZDATAPATH: The file path to the directory containing the SED, FILTER, and AB directories.
 You can set either external to python with e.g. (in bash):
-`export BPZPY3PATH=/global/homes/u/user/software/DESC_BPZ`
+`export BPZDATAPATH=/global/homes/u/user/software/DESC_BPZ`
 or you can set within python with, e.g.:
-os.environ["BPZPY3PATH"] = '/global/homes/u/user/software/DESC_BPZ'
-(where you obviously replace the path variable with your local BPZ install)
 """
 
 import desc_bpz
@@ -39,8 +36,10 @@ import pickle
 import shelve
 import h5py
 from desc_bpz.will_tools_py3 import *
-
+from desc_bpz.paths import get_fil_file, get_sed_file, get_ab_file
+from desc_bpz.paths import set_fil_dir, set_sed_dir, set_ab_dir
 from desc_bpz.coetools_py3 import pause, params_cl
+
 
 def seglist(vals, mask=None):
     """Split vals into lists based on mask > 0"""
@@ -107,10 +106,10 @@ pars.d={
     'MERGE_PEAKS':'no',
     'CONVOLVE_P':'yes',
     'P_MIN':1e-2,
-    'SED_DIR': sed_dir,
-    'AB_DIR': ab_dir,
+    'SED_DIR': get_sed_file(''),
+    'AB_DIR': get_ab_file(''),
     #'AB_DIR': '/home/will/work/bpz-1.99.3/ABcorr', ### THIS PATH NEEDS SETTING
-    'FILTER_DIR': fil_dir,
+    'FILTER_DIR': get_fil_file(''),
     'DELTA_M_0': 0.,
     'ZP_OFFSETS':0.,
     'ZC': None,
@@ -189,18 +188,19 @@ updateblank('PROBS2', 'chisq')
 #    pars.d['CHECK'] = root+'.flux_comparison'
 
 #This allows to change the auxiliary directories used by BPZ
-if pars.d['SED_DIR']!=sed_dir:
+if pars.d['SED_DIR']!=get_sed_file(''):
     print(("Changing sed_dir to ",pars.d['SED_DIR'])) 
-    sed_dir=pars.d['SED_DIR']
-    if sed_dir[-1]!='/': sed_dir+='/'
-if pars.d['AB_DIR']!=ab_dir:
+    set_sed_dir(pars.d['SED_DIR'])
+
+if pars.d['AB_DIR']!=get_ab_file(''):
     print("Changing ab_dir to ",pars.d['AB_DIR']) 
-    ab_dir=pars.d['AB_DIR']
-    if ab_dir[-1]!='/': ab_dir+='/'
-if pars.d['FILTER_DIR']!=fil_dir:
+    set_ab_dir(pars.d['AB_DIR'])
+
+
+if pars.d['FILTER_DIR']!=get_fil_file(''):
     print("Changing fil_dir to ",pars.d['FILTER_DIR']) 
-    fil_dir=pars.d['FILTER_DIR']
-    if fil_dir[-1]!='/': fil_dir+='/'
+    set_fil_dir(pars.d['FILTER_DIR'])
+
 
 
 #Better safe than sorry
@@ -278,21 +278,21 @@ else:
 
 #Get the filters in stock
 filters_db=[]
-filters_db=glob.glob(fil_dir+'*.res')
+filters_db=glob.glob(get_fil_file('*.res'))
 for i in range(len(filters_db)):
     filters_db[i]=os.path.basename(filters_db[i])
     filters_db[i]=filters_db[i][:-4]
     
 #Get the SEDs in stock
 sed_db=[]
-sed_db=glob.glob(sed_dir+'*.sed')
+sed_db=glob.glob(get_sed_file('*.sed'))
 for i in range(len(sed_db)):
     sed_db[i]=os.path.basename(sed_db[i])
     sed_db[i]=sed_db[i][:-4]
 
 #Get the ABflux files in stock
 ab_db=[]
-ab_db=glob.glob(ab_dir+'*.AB')
+ab_db=glob.glob(get_ab_file('*.AB'))
 for i in range(len(ab_db)):
     ab_db[i]=os.path.basename(ab_db[i])
     ab_db[i]=ab_db[i][:-3]
@@ -313,7 +313,7 @@ if pars.d['EXCLUDE']!='none':
 for filter in filters:
     if filter[-4:]=='.res': filter=filter[:-4]
     if filter not in filters_db:
-        print('filter ', filter, 'not in database at',fil_dir, ':')
+        print('filter ', filter, 'not in database at',get_fil_file(''), ':')
         if ask('Print filters in database?'):
             for line in filters_db: print(line)
         sys.exit()
@@ -323,7 +323,8 @@ for filter in filters:
 #if it's not there, look in the SED directory
 spectra_file=os.path.join(homedir,pars.d['SPECTRA'])
 if not os.path.exists(spectra_file):
-    spectra_file=os.path.join(sed_dir,pars.d['SPECTRA'])
+
+    spectra_file=get_sed_file(pars.d['SPECTRA'])
 
 spectra=get_str(spectra_file,0)
 for i in range(len(spectra)):
@@ -342,13 +343,13 @@ for it in range(nt):
         if filters[jf][-4:]=='.res': filtro=filters[jf][:-4]
         else: filtro=filters[jf]
         model=spectra[it]+'.'+filtro+'.AB'
-        model_path=os.path.join(ab_dir,model)
+        model_path = get_ab_file(model)
         abfiles.append(model)
         #Generate new ABflux files if not present
         # or if new_ab flag on
         if pars.d['NEW_AB']=='yes' or model[:-3] not in ab_db:
             if spectra[it] not in sed_db:
-                print('SED ', spectra[it], 'not in database at',sed_dir)
+                print('SED ', spectra[it], 'not in database at',get_sed_file(''))
                 #		for line in sed_db:
                 #                    print line
                 sys.exit()

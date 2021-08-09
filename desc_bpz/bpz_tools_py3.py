@@ -11,6 +11,7 @@ from desc_bpz.MLab_coe_py3 import *
 from desc_bpz.useful_py3 import *
 from string import *
 import os,sys
+from desc_bpz.paths import get_fil_file, get_sed_file, get_ab_file
 
 clight_AHz=2.99792458e18
 Vega='Vega_reference'
@@ -30,13 +31,6 @@ zmax_ab=12.
 dz_ab=0.01
 ab_clip=1e-6
 
-
-#Initialize path info
-#bpz_dir=os.getenv('BPZPY3PATH')
-data_dir = os.getenv('BPZDATAPATH')
-fil_dir=data_dir+'/FILTER/'
-sed_dir=data_dir+'/SED/'
-ab_dir=data_dir+'/AB/'
 
 #Auxiliary synthetic photometry functions
 
@@ -277,8 +271,8 @@ def get_sednfilter(sed,filter):
     #Figure out the correct names
     if filter[-4:]!='.res':filter=filter+'.res'
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
-    filter=fil_dir+filter
+    sed=get_sed_file(sed)
+    filter=get_fil_file(filter)
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
     nsed=len(x_sed)
@@ -311,7 +305,7 @@ def get_sed(sed):
     """
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     #Get the data
     x,y=get_data(sed,list(range(2)))
     if not ascend(x):
@@ -329,7 +323,7 @@ def get_filter(filter):
     """
     #Figure out the correct names
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_fil_file(filter)
     #Get the data
     x,y= get_data(filter,list(range(2)))
     if not ascend(x):
@@ -358,7 +352,7 @@ def normalize(x_sed,y_sed,m,filter='F814W_WFPC2',units='nu'):
     normflux=normalize(wl,spectrum,m,filter='F814W_WFPC2')
     """
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_filter_fil(filter)
     x_res,y_res=get_data(filter,list(range(2)))
     nres=len(x_res)
     nsed=len(x_sed)
@@ -384,7 +378,7 @@ class Normalize:
         normflux=normalize(wl,spectrum,m,filter='F814W_WFPC2')
         """
         if filter[-4:]!='.res':filter=filter+'.res'
-        filter=fil_dir+filter
+        filter=get_fil_file(filter)
         x_res,y_res=get_data(filter,list(range(2)))
         nres=len(x_res)
         nsed=len(x_sed)
@@ -404,7 +398,7 @@ def obs_spectrum(sed,z,madau=1):
     """Generate a redshifted and madau extincted spectrum"""
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
     #ys_z will be the redshifted and corrected spectrum    
@@ -422,9 +416,9 @@ def nf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
 
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_fil_file(filter)
 
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
@@ -471,9 +465,9 @@ def lf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
 
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_fil_file(filter)
 
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
@@ -559,9 +553,9 @@ def of_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
 
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_fil_file(filter)
 
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
@@ -611,9 +605,10 @@ def f_z_sed_AB(sed,filter,z=array([0.]),units='lambda'):
 
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    ab_file=ab_dir+sed[:-4]+'.'
+    ab_file=sed[:-4]+'.'
     if filter[-4:]!='.res':filter=filter+'.res'
     ab_file+=filter[:-4]+'.AB'
+    ab_file = get_ab_file(ab_file)
     #print 'AB file',ab_file
     if not os.path.exists(ab_file):
         ABflux(sed,filter)
@@ -642,9 +637,9 @@ def ABflux(sed,filter,madau='yes'):
 
     #Figure out the correct names
     if sed[-4:]!='.sed':sed=sed+'.sed'
-    sed=sed_dir+sed
+    sed=get_sed_file(sed)
     if filter[-4:]!='.res':filter=filter+'.res'
-    filter=fil_dir+filter
+    filter=get_fil_file(filter)
 
     #Get the data
     x_sed,y_sed=get_data(sed,list(range(2)))
@@ -744,7 +739,7 @@ def ABflux(sed,filter,madau='yes'):
             if madau!='no': ys_z=etau_madau(x_r,z_ab[i])*ys_z
             f[i]=trapz(ys_z*r,x_r)*const        
 
-    ABoutput=ab_dir+sed.split('/')[-1][:-4]+'.'+filter.split('/')[-1][:-4]+'.AB'
+    ABoutput=get_ab_file(sed.split('/')[-1][:-4]+'.'+filter.split('/')[-1][:-4]+'.AB')
 
     #print "Clipping the AB file"
     #fmax=max(f)
@@ -1471,7 +1466,7 @@ def test():
     # (No K correction) and check that their colors are constant
     x=arange(1.,10001.,10.)
     f=1./x
-    put_data(sed_dir+'test.sed',(x,f))
+    put_data(get_sed_file('test.sed'),(x,f))
     z=arange(0.,10.,.25)
     b=f_z_sed('test','B_Johnson.res',z,ccd='no',units='nu',madau='no')
     v=f_z_sed('test','V_Johnson.res',z,ccd='no',units='nu',madau='no')
