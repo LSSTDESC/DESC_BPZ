@@ -12,7 +12,6 @@ from desc_bpz.useful_py3 import *
 from string import *
 import os,sys
 from desc_bpz.paths import get_fil_file, get_sed_file, get_ab_file
-from desc_bpz.paths import set_fil_dir, set_sed_dir, set_ab_dir
 
 clight_AHz=2.99792458e18
 Vega='Vega_reference'
