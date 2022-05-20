@@ -1054,6 +1054,54 @@ def prior(z,m,info='hdfn',nt=6,ninterp=0,x=None,y=None):
             prior_dict[m_dict]=buffer
     return prior_dict[m_dict]
 
+def prior_with_dict(z,m,paramdict,info='hdfn',nt=6,ninterp=0,x=None,y=None):
+    from desc_bpz.prior_from_dict import function
+    """Given the magnitude m, produces the prior  p(z|T,m)
+    Usage: pi[:nz,:nt]=prior(z[:nz],m,info=('hdfn',nt))
+    Adaptable, as prior parameters are read in as
+    dictionary `paramdict` containing a variable number
+    of broad types
+    """    
+    if info=='none' or info=='flat': return
+    #We estimate the priors at m_step intervals
+    #and keep them in a dictionary, and then
+    #interpolate them for other values
+    m_step=0.1
+    accuracy=str(len(str(int(1./m_step)))-1)#number of decimals kept
+
+    #exec("from desc_bpz.prior_from_dict import *".format(info), globals())
+    global prior_dict
+    try:
+        len(prior_dict)
+    except NameError:
+        prior_dict={}
+
+    #The dictionary keys are values of the 
+    #magnitud quantized to mstep mags
+    #The values of the dictionary are the corresponding
+    #prior probabilities.They are only calculated once 
+    #and kept in the dictionary for future
+    #use if needed. 
+    forma='%.'+accuracy+'f'
+    m_dict=forma %m    
+    if m_dict not in prior_dict or info=='lensing': #if lensing, the magnitude alone is not enough
+        if info!='lensing':
+            prior_dict[m_dict]=function(z,float(m_dict),paramdict,nt)
+        else:
+            prior_dict[m_dict]=function(z,float(m_dict),paramdcit,nt,x,y)                    
+        if ninterp:
+            pp_i=prior_dict[m_dict]
+            nz=pp_i.shape[0]
+            nt=pp_i.shape[1]
+            nti=nt+(nt-1)*int(ninterp)
+            tipos=arange(nt)*1.
+            itipos=arange(nti)*1./(1.+float(ninterp))
+            buffer=zeros((nz,nti))*1.
+            for iz in range(nz):
+                buffer[iz,:]=match_resol(tipos,pp_i[iz,:],itipos)
+            prior_dict[m_dict]=buffer
+    return prior_dict[m_dict]
+
 def interval(p,x,ci=.99):
     """Gives the limits of the confidence interval
        enclosing ci of the total probability
