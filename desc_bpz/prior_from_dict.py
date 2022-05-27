@@ -1,7 +1,6 @@
-from desc_bpz.bpz_tools_py3 import *
 import numpy as np
 
-def function(z, m, paramdict, dummy):
+def prior_function(z, m, paramdict, nt):
     """Generic prior that reads in parameters from a
     dictionary and applies them, rather than hard
     coded    
@@ -23,6 +22,7 @@ def function(z, m, paramdict, dummy):
     
     global zt_at_a
     nz=len(z)
+    numt = np.sum(nt)
     momin_hdf=m0
     if m>32.: m=32.
     if m<m0: m=m0    
@@ -51,34 +51,36 @@ def function(z, m, paramdict, dummy):
     # but, we have to divide the total probability by the
     # number of templates in each broad type
     fot_pertemp = fo_arr / numpertype[:-1]
-    fo_t = np.reapeat(fot_pertemp, numpertype[:-1])
+    fo_t = np.repeat(fot_pertemp, numpertype[:-1])
     
     dm=m - momin_hdf
-    zmt=clip(zo + km * dm, 0.01, 15.)
+    zmt=np.clip(zo + km * dm, 0.01, 15.)
     zmt_at_a=zmt**(a)
     #We define z**a as global to keep it 
     #between function calls. That way it is 
     # estimated only once
-    try:
-        zt_at_a.shape
-    except NameError:
-        zt_at_a=power.outer(z,a)
+    #try:
+    #    zt_at_a.shape
+    #except NameError:
+    #This is getting messed up, just drop the global
+    #variable and take the hit on compute time!
+    zt_at_a=np.power.outer(z,a)
 	
     #Morphological fractions
     # need to add the fractions for the final type
     # that is 1 - others
     n_most = np.sum(numpertype[:-1])
     f_t=np.zeros((len(a),),float)
-    f_t[:n_most]=fo_t*exp(-k_t*dm)
-    f_t[n_most:]=(1.-add.reduce(f_t[:n_most]))/float(numpertype[-1])
+    f_t[:n_most]=fo_t * np.exp(-k_t*dm)
+    f_t[n_most:]=(1.-np.add.reduce(f_t[:n_most]))/float(numpertype[-1])
     #Formula:
     #zm=zo+km*(m_m_min)
     #p(z|T,m)=(z**a)*exp(-(z/zm)**a)
-    p_i=zt_at_a[:nz,:nt]*exp(-clip(zt_at_a[:nz,:nt]/zmt_at_a[:nt],0.,700.))
+    p_i=zt_at_a[:nz, :numt] * np.exp(-1. * np.clip(zt_at_a[:nz, :numt]/zmt_at_a[:numt],0.,700.))
     #This eliminates the very low level tails of the priors
-    norm=add.reduce(p_i[:nz,:nt],0)
-    p_i[:nz,:nt]=where(less(p_i[:nz,:nt]/norm[:nt],1e-2/float(nz)),
-		      0.,p_i[:nz,:nt]/norm[:nt])
-    norm=add.reduce(p_i[:nz,:nt],0)
-    p_i[:nz,:nt]=p_i[:nz,:nt]/norm[:nt]*f_t[:nt]
+    norm = np.add.reduce(p_i[:nz, :numt],0)
+    p_i = np.where(np.less(p_i[:nz, :numt]/norm[:numt],1e-2/float(nz)),
+		   0.,p_i[:nz, :numt]/norm[:numt])
+    norm = np.add.reduce(p_i[:nz, :numt],0)
+    p_i = p_i[:nz, :numt]/norm[:numt]*f_t[:numt]
     return p_i
