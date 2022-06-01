@@ -47,11 +47,19 @@ def prior_function(z, m, paramdict, nt):
     km = np.repeat(km_arr, numpertype)
     # there are one less kt and f0 values, as the final one
     # is defined as 1 - sum(others)
-    k_t = np.repeat(kt_arr, numpertype[:-1])
+    # need to put in an if for when there is only one broad type
+    if len(numpertype) == 1:
+        k_t = np.repeat(kt_arr, numpertype)
+    else:
+        k_t = np.repeat(kt_arr, numpertype[:-1])
     # but, we have to divide the total probability by the
     # number of templates in each broad type
-    fot_pertemp = fo_arr / numpertype[:-1]
-    fo_t = np.repeat(fot_pertemp, numpertype[:-1])
+    if len(numpertype) == 1:
+        fot_pertemp = fo_arr / numpertype[0]
+        fo_t = np.repeat(fot_pertemp, numpertype)
+    else:
+        fot_pertemp = fo_arr / numpertype[:-1]
+        fo_t = np.repeat(fot_pertemp, numpertype[:-1])
     
     dm=m - momin_hdf
     zmt=np.clip(zo + km * dm, 0.01, 15.)
@@ -69,10 +77,14 @@ def prior_function(z, m, paramdict, nt):
     #Morphological fractions
     # need to add the fractions for the final type
     # that is 1 - others
-    n_most = np.sum(numpertype[:-1])
-    f_t=np.zeros((len(a),),float)
-    f_t[:n_most]=fo_t * np.exp(-k_t*dm)
-    f_t[n_most:]=(1.-np.add.reduce(f_t[:n_most]))/float(numpertype[-1])
+    if len(numpertype) == 1:
+        f_t=np.zeros((len(a),),float)
+        f_t = fo_t * np.exp(-k_t*dm)
+    else:
+        n_most = np.sum(numpertype[:-1])
+        f_t=np.zeros((len(a),),float)
+        f_t[:n_most]=fo_t * np.exp(-k_t*dm)
+        f_t[n_most:]=(1.-np.add.reduce(f_t[:n_most]))/float(numpertype[-1])
     #Formula:
     #zm=zo+km*(m_m_min)
     #p(z|T,m)=(z**a)*exp(-(z/zm)**a)
