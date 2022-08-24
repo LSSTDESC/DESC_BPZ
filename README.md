@@ -4,14 +4,21 @@ This repo contains a python3 port of the popular BPZ software package (https://w
 
 If you use this code, please cite [Benitez (2000)](https://ui.adsabs.harvard.edu/abs/2000ApJ...536..571B/abstract) and [Coe et al. (2006)](https://ui.adsabs.harvard.edu/abs/2006AJ....132..926C/abstract).
 
-In order to run, you should set the environment variable<br>
+In order to run, you should set the environment variable
+
 
 `BPZDATAPATH` to point to the directory housing the SED, FILTER, and AB files.
-<br>
 
-To run traditional command-line `BPZ` use the `bpz.py` file in `scripts`, e.g.:<br>
-`python scripts/bpz.py yourasciicatalog.cat -P yourparameterfile.pars` <br>
-Dan Coe's STScI webpage listed above contains a nice BPZ user guide, for more detail on running the code, please check that website.<br>.
 
-However, this package will mainly be used as a library for running "bpz_lite" in the DESC PZ RAIL Package, see:<br>
+To run traditional command-line `BPZ` use the `bpz.py` file in `scripts`, e.g.:
+
+
+`python scripts/bpz.py yourasciicatalog.cat -P yourparameterfile.pars`
+
+
+Dan Coe's STScI webpage listed above contains a nice BPZ user guide, for more detail on running the code, please check that website.
+
+
+However, this package will mainly be used as a library for running "bpz_lite" in the DESC PZ RAIL Package, see:
+
 https://github.com/LSSTDESC/RAIL
