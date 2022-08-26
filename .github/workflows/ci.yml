@@ -3,7 +3,7 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ u/sschmidt23/reorganize ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
