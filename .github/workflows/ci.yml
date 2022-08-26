@@ -37,7 +37,7 @@ jobs:
       run: |
         export BPZDATAPATH=$PWD
         cd tests
-        python ../desc_bpz/scripts/bpz.py test1000.h5 -P test1000.pars
+        python ../src/desc_bpz/scripts/bpz.py test1000.h5 -P test1000.pars
 
     - name: Run other tests
       run: |
