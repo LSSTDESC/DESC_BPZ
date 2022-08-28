@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.5"
 license = { file = "LICENSE" }
 authors = [
-    {name = "Noel Benitez, Dan Coe, Will Hartley, Sam Schmidt, LSST DESC PZWG", email = "samuel.j.schmidt@gmail.com"}
+    {name = "Noel Benitez, Dan Coe, Will Hartley, Sam Schmidt, Joe Zuntz, LSST DESC PZWG", email = "samuel.j.schmidt@gmail.com"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
