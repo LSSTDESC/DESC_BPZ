@@ -1,5 +1,5 @@
 [project]
-name = "desc_bpz"
+name = "desc-bpz"
 description = "Python3 version of BPZ used in DESC"
 version = "0.2"
 readme = "README.md"
