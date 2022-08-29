@@ -7,16 +7,17 @@ If you use this code, please cite [Benitez (2000)](https://ui.adsabs.harvard.edu
 In order to run, you should set the environment variable
 
 
-`BPZDATAPATH` to point to the directory housing the SED, FILTER, and AB files.
+`BPZDATAPATH` to point to the directory housing the SED, FILTER, and AB files.  Default SED and FILTER files are available in the
+`src/desc_bpz/data_files/FILTER` and `src/desc_bpz/data_files/SED` directories
 
 
-To run traditional command-line `BPZ` use the `bpz.py` file in `scripts`, e.g.:
+To run traditional command-line `BPZ` use the `bpz.py` file in `src/desc_bpz/scripts`, e.g.:
 
 
-`python scripts/bpz.py yourasciicatalog.cat -P yourparameterfile.pars`
+`python src/desc_bpz/scripts/bpz.py yourasciicatalog.cat -P yourparameterfile.pars`
 
 
-Dan Coe's STScI webpage listed above contains a nice BPZ user guide, for more detail on running the code, please check that website.
+Dan Coe's STScI webpage (listed above) contains a nice BPZ user guide, for more detail on running the code, please check that website.
 
 
 However, this package will mainly be used as a library for running "bpz_lite" in the DESC PZ RAIL Package, see:

@@ -1,7 +1,7 @@
 import os
 import pytest
 dirname, _ = os.path.split(__file__)
-parent = os.path.join(dirname, '..')
+parent = os.path.join(dirname, '../src/desc_bpz/data_files/')
 
 
 # This test has to go first 
