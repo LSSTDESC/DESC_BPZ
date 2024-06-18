@@ -1849,7 +1849,7 @@ def loadsexcat(infile, purge=1, maxflags=8, minfwhm=1, minrf=0, maxmag=99, magna
     if not silent:
         print(sum(good))
 
-    if purge and not alltrue(good):
+    if purge and not all(good):
         data = compress(good, data)
         if (flags != None): flags = compress(good, flags)
         if (mag != None): mag = compress(good, mag)

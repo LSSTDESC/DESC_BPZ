@@ -487,7 +487,7 @@ if pars.d['MAG']=='yes':
         print("""Allowed values for magnitudes are 
         0<m<"""+repr(undet)+" m="+repr(undet)+"(non detection), m="+repr(unobs)+"(not observed)") 
         for i in range(len(todo)):
-            if not alltrue(todo[i,:]):
+            if not all(todo[i,:]):
                 print(i+1,f_obs[i,:],ef_obs[i,:])
         sys.exit()
  

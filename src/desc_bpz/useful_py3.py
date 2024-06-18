@@ -396,7 +396,7 @@ def ascend(x):
        Recommended usage: 
        if not ascend(x): sort(x) 
     """
-    return alltrue(greater_equal(x[1:],x[0:-1]))
+    return all(greater_equal(x[1:],x[0:-1]))
 
 
 #def match_resol(xg,yg,xf,method="linear"):
