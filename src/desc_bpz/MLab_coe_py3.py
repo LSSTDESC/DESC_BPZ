@@ -479,8 +479,8 @@ def within(A, xc, yc, ro, yesorno=0):  # --DC
     x = x-xc + 0.
     y = y-yc + 0.
     r = hypot(x,y)
-    xy = abs(divsafe(x, y, nanx=0))
-    yx = abs(divsafe(y, x, nanx=0))
+    xy = abs(divsafe(x, y, nan=0))
+    yx = abs(divsafe(y, x, nan=0))
     m = min([xy, yx])
     dr = hypot(1, m)  # = 1 ON AXES, sqrt(2) ON DIAGONALS
 
@@ -852,7 +852,7 @@ def gauss1(r, sig=1.):
 
 def atanxy(x, y, degrees=0):
     """ANGLE CCW FROM x-axis"""
-    theta = arctan(divsafe(y, x, infx=1e30, nanx=0))
+    theta = arctan(divsafe(y, x, inf=1e30, nan=0))
     theta = where(less(x, 0), theta + pi, theta)
     theta = where(logical_and(greater(x, 0), less(y, 0)), theta + 2*pi, theta)
     if degrees:
@@ -964,7 +964,7 @@ def sym8(a):
     return x / 8.
 
 #def divsafe(a, b, inf=1e30, nan=0.):
-def divsafe(a, b, infx=inf, nanx=nan):
+def divsafe(a, b, inf=inf, nan=nan):
     """a / b with a / 0 = inf and 0 / 0 = nan"""
     a = array(a).astype(float)
     b = array(b).astype(float)
@@ -976,7 +976,7 @@ def divsafe(a, b, infx=inf, nanx=nan):
     babs = clip(abs(b), 1e-200, 1e9999)
     bb = bsgn * babs
     #return where(b, a / bb, where(a, Inf, NaN))
-    return where(b, a / bb, where(a, sgn*infx, nanx))
+    return where(b, a / bb, where(a, sgn*inf, nan))
 
 def expsafe(x):
     x = array(x)
@@ -1262,7 +1262,7 @@ def interp(x, xdata, ydata, silent=0, extrap=0):  # NEW VERSION!
     y2 = take(ydata, i2)
     y1 = take(ydata, i1)
     # m = (y2 - y1) / (x2 - x1)
-    m = divsafe(y2 - y1, x2 - x1, nanx=0)
+    m = divsafe(y2 - y1, x2 - x1, nan=0)
     b = y1 - m * x1
     y = m * x + b
     if len(y) == 0:
