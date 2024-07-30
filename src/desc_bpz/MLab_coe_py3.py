@@ -685,8 +685,8 @@ def rotdeg(x, y, ang):
 def linefit(x1, y1, x2, y2):
     """y = mx + b FIT TO TWO POINTS"""
     if x2 == x1:
-        m = Inf
-        b = NaN
+        m = inf
+        b = nan
     else:
         m = (y2 - y1) / (x2 - x1)
         b = y1 - m * x1
@@ -964,7 +964,7 @@ def sym8(a):
     return x / 8.
 
 #def divsafe(a, b, inf=1e30, nan=0.):
-def divsafe(a, b, inf=Inf, nan=NaN):
+def divsafe(a, b, inf=inf, nan=nan):
     """a / b with a / 0 = inf and 0 / 0 = nan"""
     a = array(a).astype(float)
     b = array(b).astype(float)
@@ -1205,7 +1205,7 @@ def norepxy(x, y, tol=1e-8):
 
 def isseq(a):
     """TELLS YOU IF a IS SEQUENTIAL, LIKE [3, 4, 5, 6]"""
-    return (alltrue(a == arange(len(a)) + a[0]))
+    return (all(a == arange(len(a)) + a[0]))
 
 def between(lo, x, hi):  # --DC
     # RETURNS 1 WHERE lo < x < hi

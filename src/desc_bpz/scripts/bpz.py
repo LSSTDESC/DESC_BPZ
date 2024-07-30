@@ -487,7 +487,7 @@ if pars.d['MAG']=='yes':
         print("""Allowed values for magnitudes are 
         0<m<"""+repr(undet)+" m="+repr(undet)+"(non detection), m="+repr(unobs)+"(not observed)") 
         for i in range(len(todo)):
-            if not alltrue(todo[i,:]):
+            if not all(todo[i,:]):
                 print(i+1,f_obs[i,:],ef_obs[i,:])
         sys.exit()
  
@@ -1395,7 +1395,7 @@ for ig in range(ng):
         #texto='%s ' % str(id[ig])
         #texto+= len(p_bayes)*'%.3e '+'\n'
         #probs.write(texto % tuple(p_bayes))
-        idwrite[ig] = np.int(id[ig])
+        idwrite[ig] = np.int64(id[ig])
         probswrite[ig] = p_bayes
         
         #if ig<ng-1: 
