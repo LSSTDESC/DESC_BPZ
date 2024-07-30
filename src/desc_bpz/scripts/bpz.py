@@ -1395,7 +1395,7 @@ for ig in range(ng):
         #texto='%s ' % str(id[ig])
         #texto+= len(p_bayes)*'%.3e '+'\n'
         #probs.write(texto % tuple(p_bayes))
-        idwrite[ig] = np.int(id[ig])
+        idwrite[ig] = np.int64(id[ig])
         probswrite[ig] = p_bayes
         
         #if ig<ng-1: 
