@@ -1062,7 +1062,7 @@ def prior_with_dict(z,m,paramdict,info='hdfn',nt=[1, 2, 5]):
     dictionary `paramdict` containing a variable number
     of broad types
     """    
-    if info is 'none' or info is 'flat': return
+    if info == 'none' or info == 'flat': return
     #We estimate the priors at m_step intervals
     #and keep them in a dictionary, and then
     #interpolate them for other values
