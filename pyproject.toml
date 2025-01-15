@@ -21,7 +21,6 @@ dependencies = [
     "scipy",
     "pandas>=1.1",
     "h5py",
-    "tables",
 ]
 
 [project.urls]
