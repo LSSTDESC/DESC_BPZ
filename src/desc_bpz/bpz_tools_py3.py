@@ -41,10 +41,10 @@ def flux(xsr,ys,yr,ccd='yes',units='nu'):
         If units=nu, it gives f_nu as the output
     """
     if ccd=='yes': yr=yr*xsr
-    norm=trapz(yr,xsr)
-    f_l=trapz(ys*yr,xsr)/norm
+    norm=trapezoid(yr,xsr)
+    f_l=trapezoid(ys*yr,xsr)/norm
     if units=='nu':
-        lp=sqrt(norm/trapz(yr/xsr/xsr,xsr))#Pivotal wavelength	
+        lp=sqrt(norm/trapezoid(yr/xsr/xsr,xsr))#Pivotal wavelength	
         return f_l*lp**2/clight_AHz
     else: return f_l
 
@@ -57,8 +57,8 @@ def ABtofl(ABmag,filter,ccd='yes'):
 def pivotal_wl(filter,ccd='yes'):
     xr,yr=get_filter(filter)
     if ccd=='yes': yr=yr*xr
-    norm=trapz(yr,xr)
-    return sqrt(norm/trapz(yr/xr/xr,xr))  
+    norm=trapezoid(yr,xr)
+    return sqrt(norm/trapezoid(yr/xr/xr,xr))  
 
 def filter_center(filter,ccd='yes'):
     """Estimates the central wavelenght of the filter"""
@@ -68,7 +68,7 @@ def filter_center(filter,ccd='yes'):
         xr=filter[0]
         yr=filter[1]
     if ccd=='yes': yr=yr*xr
-    return trapz(yr*xr,xr)/trapz(yr,xr)
+    return trapezoid(yr*xr,xr)/trapezoid(yr,xr)
 
 def filter_fwhm(filter,ccd='yes'):
     xr,yr=get_filter(filter)
@@ -439,8 +439,8 @@ def nf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
 
     #Operations necessary for normalization and ccd effects
     if ccd=='yes': r=r*x_r
-    norm_r=trapz(r,x_r)
-    if units=='nu': const=norm_r/trapz(r/x_r/x_r,x_r)/clight_AHz
+    norm_r=trapezoid(r,x_r)
+    if units=='nu': const=norm_r/trapezoid(r/x_r/x_r,x_r)/clight_AHz
     else: const=1.
     const=const/norm_r
 
@@ -450,7 +450,7 @@ def nf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
         i1,i2=n1[i],n2[i]
         ys_z=match_resol(x_sed[i1:i2],y_sed[i1:i2],x_r/(1.+z[i]))
         if madau!='no': ys_z=etau_madau(x_r,z[i])*ys_z
-        f[i]=trapz(ys_z*r,x_r)*const        
+        f[i]=trapezoid(ys_z*r,x_r)*const        
     if nz==1: return f[0]
     else: return f
 
@@ -524,8 +524,8 @@ def lf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
 
     #Operations necessary for normalization and ccd effects
     if ccd=='yes': r=r*x_r
-    norm_r=trapz(r,x_r)
-    if units=='nu': const=norm_r/trapz(r/x_r/x_r,x_r)/clight_AHz
+    norm_r=trapezoid(r,x_r)
+    if units=='nu': const=norm_r/trapezoid(r/x_r/x_r,x_r)/clight_AHz
     else: const=1.
 
     const=const/norm_r
@@ -539,7 +539,7 @@ def lf_z_sed(sed,filter,z=array([0.]),ccd='yes',units='lambda',madau='yes'):
         if madau!='no': ys_z=etau_madau(x_r,z[i])*ys_z
         #pp=FramedPlot();pp.add(Curve(x_r,ys_z*etau_madau(x_r,z[i])));pp.show()
         #ask('More?')
-        f[i]=trapz(ys_z*r,x_r)*const        
+        f[i]=trapezoid(ys_z*r,x_r)*const        
     if nz==1: return f[0]
     else: return f
 
@@ -701,8 +701,8 @@ def ABflux(sed,filter,madau='yes'):
 
     #Operations necessary for normalization and ccd effects
     if ccd=='yes': r=r*x_r
-    norm_r=trapz(r,x_r)
-    if units=='nu': const=norm_r/trapz(r/x_r/x_r,x_r)/clight_AHz
+    norm_r=trapezoid(r,x_r)
+    if units=='nu': const=norm_r/trapezoid(r/x_r/x_r,x_r)/clight_AHz
     else: const=1.
 
     const=const/norm_r
@@ -737,7 +737,7 @@ def ABflux(sed,filter,madau='yes'):
                 print(x_r/(1.+z_ab[i]))
                 pause()
             if madau!='no': ys_z=etau_madau(x_r,z_ab[i])*ys_z
-            f[i]=trapz(ys_z*r,x_r)*const        
+            f[i]=trapezoid(ys_z*r,x_r)*const        
 
     ABoutput=get_ab_file(sed.split('/')[-1][:-4]+'.'+filter.split('/')[-1][:-4]+'.AB')
 

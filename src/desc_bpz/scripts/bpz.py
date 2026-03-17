@@ -591,7 +591,7 @@ if 'M_0' in col_pars.d:
     #take out old way, put in hdf5 way    
     #m_0_col=int(col_pars.d['M_0'])-1
     #m_0=get_data(obs_file,m_0_col)
-    m_0=get_2Darray_hdf5(obs_file,m_0_col)
+    m_0=array(get_2Darray_hdf5(obs_file,m_0_col))
     print(col_pars.d['M_0'])
 ###WILL'S m_0!
 ###    m_0=get_2Darray_fromfits(obs_file,tuple([col_pars.d['M_0'],]))
@@ -600,8 +600,12 @@ if 'M_0' in col_pars.d:
 ###    if pars.d['MAG']=='no':
 ###        m_0 = pars.d['FLUX_ZP']-2.5*log10(m_0)
     print((m_0[0]))
+    # This line now causing problems! replace!
     m_0+=pars.d['DELTA_M_0'] # this only makes sense if m_0 is in mag - so assume this and convert.
-
+    #tmp_deltam = pars.d['DELTA_M_0']
+    #lenmo = len(m_0)
+    #for ii in range(lenmo):
+    #    m_0[ii] += tmp_deltam
 #Get the objects ID (as a string)
 if 'ID' in col_pars.d:
     #print col_pars.d['ID']
