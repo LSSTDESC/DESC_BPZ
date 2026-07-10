@@ -596,7 +596,7 @@ f_z_sed=lf_z_sed
 #f_z_sed=of_z_sed
 
 
-def f_z_sed_AB(sed,filter,z=array([0.]),units='lambda'):
+def f_z_sed_AB(sed,filter,z=array([0.]),units='lambda', madau='yes'):
     #It assumes ccd=yes,madau=yes by default
     z_ab=arange(0.,zmax_ab,dz_ab) #zmax_ab and dz_ab are def. in bpz_tools
     lp=pivotal_wl(filter)
@@ -607,7 +607,11 @@ def f_z_sed_AB(sed,filter,z=array([0.]),units='lambda'):
     if sed[-4:]!='.sed':sed=sed+'.sed'
     ab_file=sed[:-4]+'.'
     if filter[-4:]!='.res':filter=filter+'.res'
-    ab_file+=filter[:-4]+'.AB'
+    if madau != 'no':
+        mflag = "withmadau"
+    else:
+        mflag = "nomadau"
+    ab_file+=filter[:-4]+'.'+mflag+'.AB'
     ab_file = get_ab_file(ab_file)
     #print 'AB file',ab_file
     if not os.path.exists(ab_file):
@@ -739,7 +743,11 @@ def ABflux(sed,filter,madau='yes'):
             if madau!='no': ys_z=etau_madau(x_r,z_ab[i])*ys_z
             f[i]=trapezoid(ys_z*r,x_r)*const        
 
-    ABoutput=get_ab_file(sed.split('/')[-1][:-4]+'.'+filter.split('/')[-1][:-4]+'.AB')
+    if madau != 'no':
+        mflag = "withmadau"
+    else:
+        mflag = "nomadau"
+    ABoutput=get_ab_file(sed.split('/')[-1][:-4]+'.'+filter.split('/')[-1][:-4]+'.'+mflag+'.AB')
 
     #print "Clipping the AB file"
     #fmax=max(f)
