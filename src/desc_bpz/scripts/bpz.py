@@ -337,12 +337,17 @@ nz=len(z)
 #Get the model fluxes
 f_mod=zeros((nz,nt,nf))*0.
 abfiles=[]
+madauflag = pars.d['MADAU']
+if madauflag != "no":
+    mflag = "withmadau"
+else:
+    mflag = "nomadau"
 
 for it in range(nt):
     for jf in range(nf):
         if filters[jf][-4:]=='.res': filtro=filters[jf][:-4]
         else: filtro=filters[jf]
-        model=spectra[it]+'.'+filtro+'.AB'
+        model=spectra[it]+'.'+filtro+'.'+mflag+'.AB'
         model_path = get_ab_file(model)
         abfiles.append(model)
         #Generate new ABflux files if not present
