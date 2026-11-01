@@ -5,13 +5,14 @@ loops in ``scripts/bpz.py`` (``mode='bpz'``) and rail_bpz's
 ``BPZliteEstimator`` (``mode='rail'``) compute with ``p_c_z_t`` and the
 prior.  Backends:
 
-* ``'numpy'``: vectorised CPU implementation (reference).
+* ``'numpy'``: vectorised CPU implementation (reference),
+* ``'jax'``:   JAX/XLA (GPU if available).
 
 Example
 -------
 >>> res = estimate_batch(flux, flux_err, f_mod, zgrid, mag0=m,
 ...                      prior_params=modeldict, p_min=0.005,
-...                      backend='numpy', dtype='float32')
+...                      backend='jax', dtype='float32')
 >>> res['pdf'].shape, res['zmode'].shape
 """
 
@@ -31,9 +32,10 @@ __all__ = [
     "BACKENDS",
 ]
 
-BACKENDS = ("numpy",)
+BACKENDS = ("numpy", "jax")
 _MODULES = {
     "numpy": ".numpy_backend",
+    "jax": ".jax_backend",
 }
 
 

@@ -33,6 +33,8 @@ dev = [
     "pytest",
     "pytest-cov", # Used to report total code coverage
 ]
+# GPU backend of desc_bpz.batched (imported lazily, optional)
+jax = ["jax[cuda12]"]
 
 [build-system]
 requires = [
