@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Benchmark outputs (summarised in benchmarks/RESULTS.md)
+benchmarks/outputs/
