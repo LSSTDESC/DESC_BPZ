@@ -33,8 +33,9 @@ dev = [
     "pytest",
     "pytest-cov", # Used to report total code coverage
 ]
-# GPU backend of desc_bpz.batched (imported lazily, optional)
+# GPU backends of desc_bpz.batched (imported lazily, both optional)
 jax = ["jax[cuda12]"]
+cuda = ["cupy-cuda12x"]
 
 [build-system]
 requires = [
@@ -52,7 +53,7 @@ testpaths = [
 ]
 
 [tool.setuptools.package-data]
-"*" = ["*.h5", "*.yaml", "*.columns", "*.pars"]
+"*" = ["*.h5", "*.yaml", "*.columns", "*.pars", "*.cu"]
 "desc_bpz.data_files.SED" = ["*.sed", "*.list"]
 "desc_bpz.data_files.AB" = ["*.AB"]
 "desc_bpz.data_files.FILTER" = ["*.res"]

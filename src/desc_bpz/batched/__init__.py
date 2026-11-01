@@ -6,7 +6,8 @@ loops in ``scripts/bpz.py`` (``mode='bpz'``) and rail_bpz's
 prior.  Backends:
 
 * ``'numpy'``: vectorised CPU implementation (reference),
-* ``'jax'``:   JAX/XLA (GPU if available).
+* ``'jax'``:   JAX/XLA (GPU if available),
+* ``'cuda'``:  CuPy with hand written CUDA C kernels.
 
 Example
 -------
@@ -32,10 +33,11 @@ __all__ = [
     "BACKENDS",
 ]
 
-BACKENDS = ("numpy", "jax")
+BACKENDS = ("numpy", "jax", "cuda")
 _MODULES = {
     "numpy": ".numpy_backend",
     "jax": ".jax_backend",
+    "cuda": ".cuda_backend",
 }
 
 
