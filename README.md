@@ -23,3 +23,23 @@ Dan Coe's STScI webpage (listed above) contains a nice BPZ user guide, for more 
 However, this package will mainly be used as a library for running "bpz_lite" in the DESC PZ RAIL Package, see:
 
 https://github.com/LSSTDESC/RAIL
+
+
+## Batched and GPU estimation
+
+`desc_bpz.batched.estimate_batch` evaluates many galaxies at once instead of looping over them.
+It reproduces both the `bpz.py` loop (`mode="bpz"`) and the loop of rail_bpz's `BPZliteEstimator` (`mode="rail"`).
+Three backends are available:
+
+- `numpy`: vectorised CPU implementation, no extra dependencies;
+- `jax`: JAX/XLA, install with `pip install 'desc-bpz[jax]'`;
+- `cuda`: hand-written CUDA kernels driven by CuPy, install with `pip install 'desc-bpz[cuda]'`.
+
+Each backend runs in `float64` (matches the loop to about 1e-11) or `float32` (about 1e-5 of the PDF peak, much faster on consumer GPUs).
+In `bpz.py` select them with the new parameters, e.g.
+
+`python src/desc_bpz/scripts/bpz.py test1000.h5 -P test1000.pars -BACKEND cuda -PRECISION float32`
+
+`BACKEND` defaults to `loop`, the original per-galaxy code.
+Options the batched path does not support (`N_PEAKS>1`, `COLOR`, `ONLY_TYPE`, the lensing prior, `PROBS`, `PROBS2`, `ADD_SPEC_PROB`) fall back to the loop with a notice.
+Speed and accuracy measurements are in [benchmarks/RESULTS.md](benchmarks/RESULTS.md).
