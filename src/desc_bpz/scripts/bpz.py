@@ -119,8 +119,11 @@ pars.d={
     "NMAX": None, # Useful for testing
     "WRITE_FLUX_COMP": 'no', #flag to write flux_comparison file use 'no' rather than False in keepint with BPZ formatting
     "H5_CHUNK_SIZE": 10000, #how big of hdf5 chunks to create at a time
-    "OUTPUT_CUT": "Null"
-}               
+    "OUTPUT_CUT": "Null",
+    "BACKEND": "loop",      # 'loop' (per galaxy), or batched: 'numpy', 'jax', 'cuda'
+    "PRECISION": "float64", # working precision of the batched backends: float64 or float32
+    "GPU_CHUNK": 0,         # galaxies per batched chunk (0: automatic)
+}             
 
 
 if pars.d['PLOTS']=='no': plots=0
@@ -991,7 +994,110 @@ if pars.d['CONVOLVE_P']=='yes':
     gaus=exp(-(x/sigma_g)**2)
 
 if pars.d["NMAX"]!=None: ng=int(pars.d["NMAX"])
-for ig in range(ng):
+
+#Batched (vectorised / GPU) estimation: computes for all galaxies at once
+#what the per-galaxy loop below computes, then writes the same outputs.
+use_batched = get_z and pars.d['BACKEND'] != 'loop'
+if use_batched:
+    unsupported = []
+    if pars.d['N_PEAKS'] > 1: unsupported.append('N_PEAKS>1')
+    if pars.d['COLOR'] == 'yes': unsupported.append('COLOR')
+    if pars.d['ONLY_TYPE'] == 'yes': unsupported.append('ONLY_TYPE')
+    if useprior and pars.d['PRIOR'] == 'lensing': unsupported.append('lensing prior')
+    if save_full_probs: unsupported.append('PROBS')
+    if save_probs2: unsupported.append('PROBS2')
+    if specprob: unsupported.append('ADD_SPEC_PROB')
+    if unsupported:
+        print('BACKEND %s does not support %s; falling back to the per-galaxy loop'
+              % (pars.d['BACKEND'], ', '.join(unsupported)))
+        use_batched = False
+
+if use_batched:
+    from desc_bpz.batched import estimate_batch, build_prior_table
+    print('Running batched BPZ with backend=%s, precision=%s'
+          % (pars.d['BACKEND'], pars.d['PRECISION']))
+    if useprior:
+        # prior() only depends on m quantised to 0.1 mag: tabulate it once
+        prior_tab, prior_idx = build_prior_table(
+            m_0[:ng], lambda m: prior(z, m, tipo_prior, nt0, ninterp)[:nz, :nt])
+    else:
+        prior_tab = ones((1, nz, nt), float) / float(nz * nt)
+        prior_idx = zeros(ng, int)
+    if cluster_prior: prior_tab = (1. - fcc) * prior_tab + pi_c
+    res = estimate_batch(
+        f_obs[:ng, :nf], ef_obs[:ng, :nf], f_mod[:nz, :nt, :nf], z,
+        prior_table=prior_tab, prior_index=prior_idx, mode='bpz',
+        p_min=float(pars.d['P_MIN']),
+        kernel=gaus if pars.d['CONVOLVE_P'] == 'yes' else None,
+        odds=odds_i, oi=oi, min_rms=pars.d['MIN_RMS'],
+        z_thr=float(pars.d['Z_THR']), zmax=float(pars.d['ZMAX']),
+        backend=pars.d['BACKEND'], dtype=pars.d['PRECISION'],
+        chunk_size=int(pars.d['GPU_CHUNK']) or None)
+
+    iz_b_all = res['iz_b']
+    it_b_all = res['t_b']
+    zb_all = z[iz_b_all]
+    o_all = res['odds']
+    odd_check = odds_i
+    if ninterp:
+        tt_b_all = it_b_all / (1. + ninterp)
+        tt_ml_all = res['it_ml'] / (1. + ninterp)
+    else:
+        tt_b_all = it_b_all * 1.
+        tt_ml_all = res['it_ml'] * 1.
+    tb_all = it_b_all + 1.
+    if not res['t_b_valid'].all():
+        print('NO CLEAR BEST t_b; ALL PROBABILITIES ZERO for %d objects'
+              % (~res['t_b_valid']).sum())
+        tt_b_all = where(res['t_b_valid'], tt_b_all, -1.)
+        tb_all = where(res['t_b_valid'], tb_all, -1.)
+    z1_all = res['z_b_min']
+    z2_all = res['z_b_max']
+    if pars.d['PHOTO_ERRORS'] == 'no':
+        zo1 = zb_all - oi * pars.d['MIN_RMS'] * (1. + zb_all)
+        zo2 = zb_all + oi * pars.d['MIN_RMS'] * (1. + zb_all)
+        z1_all = where(zo1 < z1_all, maximum(0., zo1), z1_all)
+        z2_all = where(zo2 > z2_all, zo2, z2_all)
+
+    for item in h5quantities + ([idwrite, probswrite] if save_probs else []):
+        if item.maxshape[0] is None:
+            item.resize(ng, axis=0)
+    outid[:ng] = array(id[:ng])
+    outzb[:ng] = zb_all
+    outzbmin[:ng] = z1_all
+    outzbmax[:ng] = z2_all
+    outtb[:ng] = tt_b_all + 1
+    outodds[:ng] = o_all
+    outzml[:ng] = z[res['iz_ml']]
+    outtml[:ng] = tt_ml_all + 1
+    outchi[:ng] = res['chi2_min'] / float(nf - 1.)
+    if 'Z_S' in col_pars.d:
+        outzs[:ng] = array(z_s[:ng])
+    if has_mags:
+        outmag[:ng] = m_0[:ng] - pars.d['DELTA_M_0']
+    if save_probs:
+        idwrite[:ng] = array(id[:ng]).astype(np.int64)
+        probswrite[:ng] = res['pdf']
+
+    if checkSED:
+        ft = f_mod[iz_b_all, it_b_all, :]
+        fo = f_obs[:ng]
+        efo = ef_obs[:ng]
+        factor = ft / efo / efo
+        am = add.reduce(fo * factor, -1) / add.reduce(ft * factor, -1)
+        ft = ft * am[:, newaxis]
+        good = o_all >= odd_check
+        frat[:ng][good] = divsafe(fo, ft, inf=1e-10, nan=1e-10)[good]
+        fw[:ng][good] = clip(divsafe(fo, efo, inf=1e8, nan=0), 0, 100)[good]
+        if write_flux_comp:
+            for ig in range(ng):
+                flux_comparison = [id[ig], m_0[ig], zb_all[ig], tb_all[ig], am[ig]] \
+                    + list(concatenate([ft[ig], fo[ig], efo[ig]]))
+                nfc = len(flux_comparison)
+                format_fc = '%s  %.2f  %.2f   %i' + (nfc - 4) * '   %.3e' + '\n'
+                buffer_flux_comparison += format_fc % tuple(flux_comparison)
+
+for ig in range(0 if use_batched else ng):
     #Don't run BPZ on galaxies with have z_s > z_max
     #if col_pars.d.has_key('Z_S'):
     #    if z_s[ig]<9.9 and z_s[ig]>zmax : continue
